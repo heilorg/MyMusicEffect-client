@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class Register extends Component {
     constructor(props) {
@@ -8,8 +8,7 @@ class Register extends Component {
         this.state = {
             id: "",
             password: "",
-            name: "",
-            error: ""
+            name: ""
         };
 
         this.handleIdChange = this.handleIdChange.bind(this);
@@ -74,15 +73,18 @@ class Register extends Component {
                         alert("해당 아이디의 유저가 이미 존재합니다.");
                         break;
                     default:
-                        alert("성공적으로  회원가입되었습니다.");
-                        window.location.href = "/";
+                        if (res.success !== undefined && res.success) {
+                            alert("성공적으로  회원가입되었습니다.");
+                            window.location.href = "/";
+                        } else {
+                            alert("예기치 못한 오류 발생");
+                        }
                         break;
                 }
             });
     }
 
     render() {
-        let error = this.state.error;
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
@@ -115,7 +117,7 @@ class Register extends Component {
                     <button>Submit</button>
                 </form>
 
-                <div>{error}</div>
+                <Link to="/">로그인</Link>
             </div>
         );
     }
