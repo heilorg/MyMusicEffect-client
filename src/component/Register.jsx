@@ -86,8 +86,8 @@ class Register extends Component {
 
     render() {
         return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
+            <div className="form-container">
+                <form onSubmit={this.handleSubmit} className="form-main">
                     <label>
                         id :
                         <input
