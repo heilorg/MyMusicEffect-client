@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import "../style/login.css";
+import "../style/form.css";
 
 class Login extends Component {
     constructor(props) {
@@ -77,25 +77,24 @@ class Login extends Component {
                 <div className="form-heading">
                     <h1>로그인</h1>
                 </div>
-
                 <form onSubmit={this.handleSubmit} className="form-main">
                     <div className="form-item">
-                        <label for="userid">아이디 :</label>
                         <input
                             type="text"
                             value={this.state.id}
                             onChange={this.handleIdChange}
                             id="userid"
+                            placeholder="아이디"
                         />
                     </div>
 
                     <div className="form-item">
-                        <label for="userpass">패스워드 :</label>
                         <input
                             type="password"
                             value={this.state.password}
                             onChange={this.handlePasswordChange}
                             id="userpass"
+                            placeholder="비밀번호"
                         />
                     </div>
 
@@ -104,9 +103,10 @@ class Login extends Component {
                     </div>
                 </form>
 
-                <Link to="/register" className="form-otherlink">
-                    회원가입
-                </Link>
+                <div className="form-otherlink">
+                    계정이 없으시다면&nbsp;
+                    <Link to="/register">회원가입</Link>
+                </div>
             </div>
         );
     }

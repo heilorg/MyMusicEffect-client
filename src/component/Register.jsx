@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import "../style/form.css";
 
 class Register extends Component {
     constructor(props) {
@@ -87,37 +88,46 @@ class Register extends Component {
     render() {
         return (
             <div className="form-container">
+                <div className="form-heading">
+                    <h1>회원가입</h1>
+                </div>
                 <form onSubmit={this.handleSubmit} className="form-main">
-                    <label>
-                        id :
+                    <div className="form-item">
                         <input
                             type="text"
                             value={this.state.id}
                             onChange={this.handleIdChange}
+                            placeholder="아이디"
                         />
-                    </label>
-                    <label>
-                        password :
+                    </div>
+
+                    <div className="form-item">
                         <input
                             type="password"
                             value={this.state.password}
                             onChange={this.handlePasswordChange}
+                            placeholder="비밀번호"
                         />
-                    </label>
+                    </div>
 
-                    <label>
-                        name :
+                    <div className="form-item">
                         <input
                             type="text"
                             value={this.state.name}
                             onChange={this.handleNameChange}
+                            placeholder="이름"
                         />
-                    </label>
+                    </div>
 
-                    <button>Submit</button>
+                    <div className="form-item">
+                        <button>회원가입</button>
+                    </div>
                 </form>
 
-                <Link to="/">로그인</Link>
+                <div className="form-otherlink">
+                    계정이 있으시다면&nbsp;
+                    <Link to="/">로그인</Link>
+                </div>
             </div>
         );
     }

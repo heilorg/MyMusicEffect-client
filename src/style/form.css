@@ -1,0 +1,45 @@
+.form-container {
+    width: 400px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 4px 4px 4px 4px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    padding: 30px;
+    margin-top: 30px;
+}
+
+.form-heading {
+    margin-bottom: 10px;
+}
+.form-main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.form-otherlink {
+    color: black;
+    margin-top: 12px;
+}
+.form-otherlink a {
+    color: #2fcebb;
+}
+
+.form-item {
+    width: 100%;
+    margin: 7px 0;
+}
+.form-item input {
+    width: 100%;
+    height: 36px;
+    padding-left: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+.form-item button {
+    width: 100%;
+    height: 34px;
+    border: none;
+    background-color: #2fcebb;
+    color: white;
+    font-size: 17px;
+}

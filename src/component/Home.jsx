@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "../style/home.css";
 
 class Home extends Component {
     constructor(props) {
@@ -45,9 +46,11 @@ class Home extends Component {
     render() {
         let name = this.state.name;
         return (
-            <div>
-                {name}'s Music
-                <button onClick={this.handleLogout}>로그아웃</button>
+            <div className="main-container">
+                <h1>
+                    {name}'s Music
+                    <button onClick={this.handleLogout}>로그아웃</button>
+                </h1>
             </div>
         );
     }
