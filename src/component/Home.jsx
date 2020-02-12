@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { MdAdd } from "react-icons/md";
 import "../style/home.css";
 
 class Home extends Component {
@@ -7,6 +8,8 @@ class Home extends Component {
         this.state = { name: "" };
 
         this.handleLogout = this.handleLogout.bind(this);
+        this.onDragOver = this.onDragOver.bind(this);
+        this.onFileDrop = this.onFileDrop.bind(this);
     }
 
     handleLogout() {
@@ -22,6 +25,19 @@ class Home extends Component {
                     window.location = "/";
                 }
             });
+    }
+
+    onDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    onFileDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.persist();
+
+        console.log(event);
     }
 
     componentDidMount() {
@@ -47,10 +63,35 @@ class Home extends Component {
         let name = this.state.name;
         return (
             <div className="main-container">
-                <h1>
-                    {name}'s Music
+                <div className="music-owner">
+                    <h1>{name}'s Music</h1>
                     <button onClick={this.handleLogout}>로그아웃</button>
-                </h1>
+                </div>
+                <div className="player">
+                    <div
+                        className="music-list"
+                        onDragOver={this.onDragOver}
+                        onDrop={this.onFileDrop}
+                    >
+                        <div className="list-item">
+                            <div>music name</div>
+                            <div>other data</div>
+                        </div>
+                        <div className="list-item">
+                            <div>music name</div>
+                            <div>other data</div>
+                        </div>
+                        <div className="list-item">
+                            <div>music name</div>
+                            <div>other data</div>
+                        </div>
+                        <div className="list-item add-item">
+                            <MdAdd />
+                            <input type="file" />
+                        </div>
+                    </div>
+                    <div className="effecter"></div>
+                </div>
             </div>
         );
     }
