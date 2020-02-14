@@ -45,8 +45,21 @@
     text-align: center;
     line-height: 34px;
     font-size: 34px;
+    cursor: pointer;
 }
 .effecter {
     width: 75%;
     height: 500px;
+    padding: 0 20px;
+}
+.effect-tool-button button {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 24px;
+
+    background-color: white;
+    color: #2fcebb;
+    border: none;
+    outline: none;
 }
