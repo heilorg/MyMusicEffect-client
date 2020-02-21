@@ -52,6 +52,9 @@
     height: 500px;
     padding: 0 20px;
 }
+.effect-tool-button {
+    padding-left: 20px;
+}
 .effect-tool-button button {
     width: 24px;
     height: 24px;
