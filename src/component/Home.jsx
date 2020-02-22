@@ -38,6 +38,9 @@ class Home extends Component {
         this.musicPause = this.musicPause.bind(this);
         this.musicStop = this.musicStop.bind(this);
         this.musicEnd = this.musicEnd.bind(this);
+        this.musicNext = this.musicNext.bind(this);
+        this.musicPrevious = this.musicPrevious.bind(this);
+        this.musicSelect = this.musicSelect.bind(this);
         this.audioData = this.audioData.bind(this);
     }
 
@@ -67,93 +70,60 @@ class Home extends Component {
         event.persist();
 
         let loadSongs = event.dataTransfer.files;
-        let songs = [];
         for (let i = 0; i < loadSongs.length; i++) {
             let song = loadSongs[i];
-            if (song.type.substring(0, 5) !== "audio") {
-                alert("음악파일만 업로드 가능합니다.");
-                continue;
-            }
-            if (song.type.substring(6) !== "mp3") {
-                alert(".mp3 파일만 업로드 가능합니다.");
-                continue;
-            }
-
-            let songData = {
-                title: song.name,
-                path: URL.createObjectURL(song)
-            };
-            songs.push(songData);
-
-            if (this.state.songs.length === 0) {
-                AUDIO.src = songData.path;
-            }
-
-            let formData = new FormData();
-            formData.append("title", song.name);
-            formData.append("data", song);
-            fetch("api/song/add", {
-                method: "POST",
-                body: formData
-            })
-                .catch(err => {
-                    console.log(err);
-                    alert("잘못된 파일입니다.");
-                })
-                .then(res => res.json())
-                .then(res => {
-                    console.log("추가 완료");
-                });
+            this.musicUpload(song);
         }
-        let state = this.state.songs;
-        this.setState({
-            songs: state.concat(songs)
-        });
     }
 
     addMusic() {
-        // event.persist();
         let fileLoader = document.createElement("input");
         fileLoader.type = "file";
         fileLoader.addEventListener("change", event => {
             let song = event.target.files[0];
-            if (song.type.substring(0, 5) !== "audio") {
-                alert("음악파일만 업로드 가능합니다.");
-                return;
-            }
-            console.log(song.type.substring(6));
-            if (song.type.substring(6) !== "mp3") {
-                alert(".mp3 파일만 업로드 가능합니다.");
-                return;
-            }
-
-            let songData = {
-                title: song.name,
-                path: URL.createObjectURL(song)
-            };
-            if (this.state.songs.length === 0) {
-                AUDIO.src = songData.path;
-            }
-            let formData = new FormData();
-            formData.append("title", song.name);
-            formData.append("data", song);
-            fetch("api/song/add", {
-                method: "POST",
-                body: formData
-            })
-                .catch(err => {
-                    console.log(err);
-                    alert("잘못된 파일입니다.");
-                })
-                .then(res => res.json())
-                .then(res => {
-                    console.log("추가 완료");
-                    this.setState({
-                        songs: this.state.songs.concat(songData)
-                    });
-                });
+            this.musicUpload(song);
         });
         fileLoader.click();
+    }
+
+    musicUpload(song) {
+        if (song.type.substring(0, 5) !== "audio") {
+            alert("음악파일만 업로드 가능합니다.");
+            return false;
+        }
+        if (song.type.substring(6) !== "mp3") {
+            alert(".mp3 파일만 업로드 가능합니다.");
+            return false;
+        }
+
+        let songData = {
+            title: song.name,
+            path: URL.createObjectURL(song)
+        };
+        let formData = new FormData();
+        formData.append("title", song.name);
+        formData.append("data", song);
+        fetch("api/song/add", {
+            method: "POST",
+            body: formData
+        })
+            .catch(err => {
+                console.log(err);
+                songData = false;
+                alert("잘못된 파일입니다.");
+            })
+            .then(res => res.json())
+            .then(res => {
+                console.log("추가 완료");
+
+                if (this.state.songs.length === 0) {
+                    AUDIO.src = songData.path;
+                }
+                this.setState({
+                    songs: this.state.songs.concat(songData)
+                });
+            });
+        return songData;
     }
 
     getMusic(res) {
@@ -171,12 +141,8 @@ class Home extends Component {
     }
 
     musicPlay() {
-        if (this.state.songs.length === 0) return false;
-        if (this.state.songs[0].path.substring(0, 4) === "blob") {
-            AUDIO.src = this.state.songs[0].path;
-        } else {
-            AUDIO.src = "/" + this.state.songs[0].path;
-        }
+        let { songs } = this.state;
+        if (songs.length === 0) return false;
 
         AUDIO.play();
         this.setState({
@@ -192,7 +158,6 @@ class Home extends Component {
     }
 
     musicStop() {
-        console.log("click");
         AUDIO.pause();
         AUDIO.currentTime = 0;
         this.setState({
@@ -201,11 +166,54 @@ class Home extends Component {
     }
 
     musicEnd() {
+        this.musicNext();
+    }
+
+    musicNext() {
         let { songs, nowSong } = this.state;
 
-        AUDIO.src = songs[++nowSong].path;
+        let nextSong = nowSong + 1;
+
+        if (nextSong > songs.length - 1) {
+            nextSong = 0;
+        }
+
+        AUDIO.src = songs[nextSong].path;
         AUDIO.play();
-        this.setState({ nowSong });
+
+        nowSong = nextSong;
+        this.setState({ nowSong, audioStatus: STATUS.PLAY });
+    }
+
+    musicPrevious() {
+        let { songs, nowSong } = this.state;
+        let prevSong = nowSong - 1;
+
+        if (prevSong < 0) {
+            prevSong = songs.length - 1;
+        }
+
+        AUDIO.src = songs[prevSong].path;
+        AUDIO.play();
+
+        nowSong = prevSong;
+        this.setState({ nowSong, audioStatus: STATUS.PLAY });
+    }
+
+    musicSelect(index) {
+        let { songs } = this.state;
+        AUDIO.src = songs[index].path;
+        AUDIO.play();
+
+        this.setState({ nowSong: index, audioStatus: STATUS.PLAY });
+    }
+
+    contextOpen() {}
+
+    contextClose() {}
+
+    changeTime(time) {
+        AUDIO.currentTime = time;
     }
 
     audioSet(res) {
@@ -214,7 +222,7 @@ class Home extends Component {
         if (res.length > 0) {
             AUDIO.src = res[0].path;
         }
-        requestAnimationFrame(this.audioData);
+        this.audioData();
     }
 
     audioData() {
@@ -245,8 +253,8 @@ class Home extends Component {
     }
 
     render() {
-        let { name, currentTime, duration, audioStatus } = this.state;
-        duration = isNaN(duration) ? 0 : duration;
+        let { name, currentTime, duration, audioStatus, nowSong } = this.state;
+        duration = duration || 0;
         let printTime = {
             currentTimeM:
                 Math.round(currentTime / 60) < 10
@@ -284,7 +292,13 @@ class Home extends Component {
                             <MdAdd />
                         </div>
                         {this.state.songs.map((song, idx) => (
-                            <div className="list-item" key={idx}>
+                            <div
+                                className={`list-item ${
+                                    idx == nowSong ? "active" : ""
+                                }`}
+                                key={idx}
+                                onDoubleClick={() => this.musicSelect(idx)}
+                            >
                                 <div>{song.title}</div>
                             </div>
                         ))}
@@ -292,7 +306,7 @@ class Home extends Component {
                     <div className="effecter">
                         <div className="effect-tool">
                             <div className="effect-tool-button">
-                                <button>
+                                <button onClick={this.musicPrevious}>
                                     <MdSkipPrevious />
                                 </button>
                                 {audioStatus === STATUS.PAUSE ? (
@@ -308,7 +322,7 @@ class Home extends Component {
                                 <button onClick={this.musicStop}>
                                     <MdStop />
                                 </button>
-                                <button onClick={this.musicEnd}>
+                                <button onClick={this.musicNext}>
                                     <MdSkipNext />
                                 </button>
                             </div>
@@ -320,6 +334,7 @@ class Home extends Component {
                             <Progress
                                 currentTime={currentTime}
                                 duration={duration}
+                                changeTime={this.changeTime}
                             />
                         </div>
                     </div>
