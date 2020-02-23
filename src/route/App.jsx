@@ -6,15 +6,12 @@ class App extends React.Component {
     render() {
         return (
             <Router>
-                <div>
-                    {/* <Header /> */}
-                    <Switch>
-                        <Route exact path="/" component={Login} />
-                        <Route path="/register" component={Register} />
-                        <Route path="/home" component={Home} />
-                        <Route component={NoMatch} />
-                    </Switch>
-                </div>
+                <Switch>
+                    <Route exact path="/" component={Login} />
+                    <Route path="/register" component={Register} />
+                    <Route path="/home" component={Home} />
+                    <Route component={NoMatch} />
+                </Switch>
             </Router>
         );
     }

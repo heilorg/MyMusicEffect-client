@@ -13,7 +13,8 @@ class Progress extends Component {
         console.log(event);
         this.props.changeTime(
             ((event.clientX - event.target.offsetLeft) /
-                event.target.clientWidth) *
+                event.nativeEvent.path.filter(x => x.className == "progress")[0]
+                    .clientWidth) *
                 this.props.duration
         );
     }

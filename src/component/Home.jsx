@@ -5,7 +5,8 @@ import {
     MdStop,
     MdSkipPrevious,
     MdSkipNext,
-    MdPause
+    MdPause,
+    MdDelete
 } from "react-icons/md";
 import "../style/home.css";
 import Progress from "./Progress";
@@ -41,6 +42,7 @@ class Home extends Component {
         this.musicNext = this.musicNext.bind(this);
         this.musicPrevious = this.musicPrevious.bind(this);
         this.musicSelect = this.musicSelect.bind(this);
+        this.musicDelete = this.musicDelete.bind(this);
         this.audioData = this.audioData.bind(this);
     }
 
@@ -208,9 +210,23 @@ class Home extends Component {
         this.setState({ nowSong: index, audioStatus: STATUS.PLAY });
     }
 
-    contextOpen() {}
-
-    contextClose() {}
+    musicDelete() {
+        let { songs, nowSong } = this.state;
+        fetch("/api/song/delete/" + songs[nowSong]._id, {
+            method: "delete"
+        })
+            .catch(err => {
+                console.log(err);
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert("성공적으로 삭제되었습니다.");
+                this.setState({
+                    songs: songs.filter((item, idx) => idx !== nowSong),
+                    nowSong: nowSong === songs.length - 2 ? 0 : nowSong
+                });
+            });
+    }
 
     changeTime(time) {
         AUDIO.currentTime = time;
@@ -306,31 +322,42 @@ class Home extends Component {
                     <div className="effecter">
                         <div className="effect-tool">
                             <div className="effect-tool-button">
-                                <button onClick={this.musicPrevious}>
-                                    <MdSkipPrevious />
-                                </button>
-                                {audioStatus === STATUS.PAUSE ? (
-                                    <button onClick={this.musicPlay}>
-                                        <MdPlayArrow />
+                                <div className="left-container">
+                                    <button onClick={this.musicPrevious}>
+                                        <MdSkipPrevious />
                                     </button>
-                                ) : null}
-                                {audioStatus === STATUS.PLAY ? (
-                                    <button onClick={this.musicPause}>
-                                        <MdPause />
+                                    {audioStatus === STATUS.PAUSE ? (
+                                        <button onClick={this.musicPlay}>
+                                            <MdPlayArrow />
+                                        </button>
+                                    ) : null}
+                                    {audioStatus === STATUS.PLAY ? (
+                                        <button onClick={this.musicPause}>
+                                            <MdPause />
+                                        </button>
+                                    ) : null}
+                                    <button onClick={this.musicStop}>
+                                        <MdStop />
                                     </button>
-                                ) : null}
-                                <button onClick={this.musicStop}>
-                                    <MdStop />
-                                </button>
-                                <button onClick={this.musicNext}>
-                                    <MdSkipNext />
+                                    <button onClick={this.musicNext}>
+                                        <MdSkipNext />
+                                    </button>
+                                    <span className="time-container">
+                                        {printTime.currentTimeM}:
+                                        {printTime.currentTimeS}{" "}
+                                        {printTime.durationM}:
+                                        {printTime.durationS}
+                                    </span>
+                                </div>
+
+                                <button
+                                    className="delete-btn"
+                                    onClick={this.musicDelete}
+                                >
+                                    <MdDelete />
                                 </button>
                             </div>
-                            <div>
-                                {printTime.currentTimeM}:
-                                {printTime.currentTimeS} {printTime.durationM}:
-                                {printTime.durationS}
-                            </div>
+
                             <Progress
                                 currentTime={currentTime}
                                 duration={duration}
