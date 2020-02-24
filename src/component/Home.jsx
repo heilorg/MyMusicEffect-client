@@ -10,6 +10,7 @@ import {
 } from "react-icons/md";
 import "../style/home.css";
 import Progress from "./Progress";
+import Equalizer from "./Equalizer";
 
 let AUDIO;
 
@@ -27,7 +28,9 @@ class Home extends Component {
             currentTime: 0,
             duration: 1,
             nowSong: 0,
-            audioStatus: STATUS.PAUSE
+            audioStatus: STATUS.PAUSE,
+            analyser: null,
+            dataArr: null
         };
 
         this.handleLogout = this.handleLogout.bind(this);
@@ -119,7 +122,7 @@ class Home extends Component {
                 console.log("추가 완료");
 
                 if (this.state.songs.length === 0) {
-                    AUDIO.src = songData.path;
+                    this.musicChange(songData.path);
                 }
                 this.setState({
                     songs: this.state.songs.concat(songData)
@@ -180,11 +183,8 @@ class Home extends Component {
             nextSong = 0;
         }
 
-        AUDIO.src = songs[nextSong].path;
-        AUDIO.play();
-
-        nowSong = nextSong;
-        this.setState({ nowSong, audioStatus: STATUS.PLAY });
+        this.musicChange(songs[nextSong].path);
+        this.setState({ nowSong: nextSong });
     }
 
     musicPrevious() {
@@ -195,19 +195,15 @@ class Home extends Component {
             prevSong = songs.length - 1;
         }
 
-        AUDIO.src = songs[prevSong].path;
-        AUDIO.play();
-
-        nowSong = prevSong;
-        this.setState({ nowSong, audioStatus: STATUS.PLAY });
+        this.musicChange(songs[prevSong].path);
+        this.setState({ nowSong: prevSong });
     }
 
     musicSelect(index) {
         let { songs } = this.state;
-        AUDIO.src = songs[index].path;
-        AUDIO.play();
 
-        this.setState({ nowSong: index, audioStatus: STATUS.PLAY });
+        this.musicChange(songs[index].path);
+        this.setState({ nowSong: index });
     }
 
     musicDelete() {
@@ -221,11 +217,31 @@ class Home extends Component {
             .then(res => res.json())
             .then(res => {
                 alert("성공적으로 삭제되었습니다.");
-                this.setState({
-                    songs: songs.filter((item, idx) => idx !== nowSong),
-                    nowSong: nowSong === songs.length - 2 ? 0 : nowSong
-                });
+                songs = songs.filter((item, idx) => idx !== nowSong);
+                nowSong = nowSong === songs.length - 2 ? 0 : nowSong;
+
+                this.musicChange(songs[nowSong].path);
+                this.setState({ songs, nowSong });
             });
+    }
+
+    musicChange(path) {
+        let { audioStatus } = this.state;
+        AUDIO.src = path;
+        if (audioStatus === STATUS.PLAY) {
+            AUDIO.play();
+        }
+        let aCtx = new AudioContext();
+        let src = aCtx.createMediaElementSource(AUDIO);
+        const analyser = aCtx.createAnalyser();
+        src.connect(aCtx.destination);
+        src.connect(analyser);
+        analyser.fftSize = 32;
+
+        const bufferLength = analyser.frequencyBinCount;
+        let dataArr = new Uint8Array(bufferLength);
+
+        this.setState({ analyser, dataArr });
     }
 
     changeTime(time) {
@@ -236,16 +252,20 @@ class Home extends Component {
         AUDIO = new Audio();
         AUDIO.addEventListener("ended", this.musicEnd);
         if (res.length > 0) {
-            AUDIO.src = res[0].path;
+            this.musicChange(res[0].path);
         }
         this.audioData();
     }
 
     audioData() {
         let { currentTime, duration } = AUDIO;
+        let { analyser, dataArr } = this.state;
+
+        analyser.getByteFrequencyData(dataArr);
         this.setState({
             currentTime,
-            duration
+            duration,
+            dataArr
         });
         requestAnimationFrame(this.audioData);
     }
@@ -269,7 +289,14 @@ class Home extends Component {
     }
 
     render() {
-        let { name, currentTime, duration, audioStatus, nowSong } = this.state;
+        let {
+            name,
+            currentTime,
+            duration,
+            audioStatus,
+            nowSong,
+            dataArr
+        } = this.state;
         duration = duration || 0;
         let printTime = {
             currentTimeM:
@@ -319,7 +346,7 @@ class Home extends Component {
                             </div>
                         ))}
                     </div>
-                    <div className="effecter">
+                    <div className="effector">
                         <div className="effect-tool">
                             <div className="effect-tool-button">
                                 <div className="left-container">
@@ -364,6 +391,8 @@ class Home extends Component {
                                 changeTime={this.changeTime}
                             />
                         </div>
+
+                        <Equalizer dataArr={dataArr}></Equalizer>
                     </div>
                 </div>
             </div>

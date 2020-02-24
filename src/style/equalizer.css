@@ -1,0 +1,17 @@
+.equalizer-container {
+    width: 100%;
+    height: 446px;
+    padding: 0 20px;
+}
+
+.equalizer-viewer {
+    width: 100%;
+    height: 98%;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-around;
+}
+.viewer-item {
+    background-color: #2fcebb;
+    width: 35px;
+}
