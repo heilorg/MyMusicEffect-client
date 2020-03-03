@@ -35,20 +35,43 @@
 .music-list {
     width: 25%;
     height: 500px;
+    overflow-y: scroll;
+}
+.music-list::-webkit-scrollbar {
+    display: none;
 }
 .list-item {
     width: 100%;
-    height: 60px;
-    border: 1px solid black;
+    padding: 10px;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    border-bottom: 1px solid #2fcebb;
 }
 .list-item.active {
     background-color: #2fcebb;
     color: #fff;
     border: none;
 }
-.list-item div {
-    user-select: none;
+
+.list-item:hover div {
+    margin: 0;
+    display: inline-block;
+    white-space: nowrap;
+    animation-name: marquee;
+    animation-timing-function: linear;
+    animation-duration: 5s;
 }
+@keyframes marquee {
+    from {
+        transform: translate(0%);
+    }
+    99%,
+    to {
+        transform: translate(-100%);
+    }
+}
+
 .add-item {
     height: 34px;
     background-color: #2fcebb;
@@ -58,6 +81,8 @@
     line-height: 34px;
     font-size: 34px;
     cursor: pointer;
+    padding: 0;
+    margin-bottom: 3px;
 }
 .effector {
     width: 75%;
@@ -86,6 +111,4 @@
     color: #2fcebb;
     border: none;
     outline: none;
-}
-.delete-btn {
 }

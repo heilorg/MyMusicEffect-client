@@ -227,6 +227,8 @@ class Home extends Component {
 
     musicChange(path) {
         let { audioStatus } = this.state;
+        AUDIO.pause();
+        AUDIO = new Audio();
         AUDIO.src = path;
         if (audioStatus === STATUS.PLAY) {
             AUDIO.play();
@@ -260,8 +262,9 @@ class Home extends Component {
     audioData() {
         let { currentTime, duration } = AUDIO;
         let { analyser, dataArr } = this.state;
-
-        analyser.getByteFrequencyData(dataArr);
+        if (analyser !== null) {
+            analyser.getByteFrequencyData(dataArr);
+        }
         this.setState({
             currentTime,
             duration,
